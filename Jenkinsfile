@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         GIT_REPO = 'git@github.com:thejasreealuri1808/java11-examples.git'
-        GIT_BRANCH = 'main'
+        GIT_BRANCH = 'master'
 
         REGISTRY = 'localhost:5000'
         IMAGE_NAME = 'java11-examples'
@@ -15,7 +15,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: "${GIT_BRANCH}",
-                    credentialsId: 'github-ssh-key',
+                    credentialsId: devopssh
                     url: "${GIT_REPO}"
             }
         }
