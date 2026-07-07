@@ -1,22 +1,49 @@
 pipeline {
-agent any
-stages {
-  stage('SCM code') {
-   steps {
-    git 'https://github.com/hellokaton/java11-examples.git'
-   }
-  }
- stage('Build') {
-  steps {
-   sh 'mvn clean package'
-  }
- }
- stage('Publish') {
-  steps {
-  // Add steps to publish artifacts or deploy the application
-  // For example, you can use the 'archiveArtifacts' step to archive built artifacts
-  archiveArtifacts 'target/*.jar'
-     }
-  }
-}
+    agent any
+
+    environment {
+        GIT_REPO = 'git@github.com:thejasreealuri1808/java11-examples.git'
+        GIT_BRANCH = 'main'
+
+        REGISTRY = 'localhost:5000'
+        IMAGE_NAME = 'java11-examples'
+        IMAGE_TAG = "${BUILD_NUMBER}"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: "${GIT_BRANCH}",
+                    credentialsId: 'github-ssh-key',
+                    url: "${GIT_REPO}"
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh """
+                        docker build -t ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} .
+                        docker tag ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} ${REGISTRY}/${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh """
+                    docker push ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                    docker push ${REGISTRY}/${IMAGE_NAME}:latest
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
 }
