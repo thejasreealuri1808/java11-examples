@@ -14,10 +14,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: "${GIT_BRANCH}",
-                    credentialsId: 'devopssh',
-                    url: "${GIT_REPO}"
-            }
+                 git credentialsId: 'git', url: 'git@github.com:thejasreealuri1808/java11-examples.git'
+		}
         }
 
         stage('Build Docker Image') {
