@@ -15,7 +15,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: "${GIT_BRANCH}",
-                    credentialsId: devopssh
+                    credentialsId: devopssh,
                     url: "${GIT_REPO}"
             }
         }
